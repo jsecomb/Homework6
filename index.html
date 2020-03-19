@@ -67,7 +67,7 @@
 
         
         $.ajax({
-            url: "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey,
+            url: "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey,
             method: "GET"
         }).then(function (response) {
             console.log(response);
@@ -83,7 +83,7 @@
 
             var iconCode = response.weather[0].icon;
             console.log(iconCode);
-            var iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png"; 
+            var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png"; 
             
             $(icon).attr("src", iconUrl);
             $(location).text(response.name);
