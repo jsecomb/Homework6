@@ -1,0 +1,7 @@
+.jumbotron{
+    padding: 20px;
+}
+
+#weatherIcon{
+    display: inline-block;
+}
