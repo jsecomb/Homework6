@@ -18,14 +18,15 @@
 </div>
 
 <body>
-    <div class="container">
+    <div class="container" id="pageBody">
         <div class="row">
             <div class="col-3">
-                <form class="form-group">
-                    <label for="formGroupExampleInput">Search for a City:</label>
-                    <input id="search" type="text" class="form-control">
-                </form>
-                <button id="submit" type="submit"><i class="fa fa-search"></i></button>
+                <div container="container" id="searchArea">
+                    <h4>Search city weather</h4>
+                    <input type="text" id="search" placeholder="Enter a city">
+                    <button id="submit" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+                <div container="container" id="searchHistoryButtons"></div>
             </div>
             <div class="col-9">
                 <div class="row">
@@ -35,22 +36,7 @@
                 <div class="row">
                     Five Day Forecast:
                 </div>
-                <div class="row">
-                    <div class="col">
-                        Day 1 of 5
-                    </div>
-                    <div class="col">
-                        Day 2 of 5
-                    </div>
-                    <div class="col">
-                       Day 3 of 5
-                    </div>
-                    <div class="col">
-                       Day 4 of 5
-                    </div>
-                    <div class="col">
-                       Day 5 of 5
-                    </div>
+                <div class="row" id="forecastContainer">
                 </div>
             </div>
         </div>
@@ -59,19 +45,35 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
+
+    var apiKey = "d1e2220fab9432369f86d8c8f2b3df41";
+    var city;
+
+    
+    document.querySelector("#searchHistoryButtons").style.display = "none";
+    document.querySelector("#currentForecast").style.display = "none";
+    
     
     $("#submit").on("click", function () {
-        var city = $("#search").val();
-        console.log(city);
-        var apiKey = "d1e2220fab9432369f86d8c8f2b3df41";
+        city = $("#search").val();
+        renderCurrent();
+        renderForecast();
+    })
 
-        
+    $("#searchHistoryButtons").on("click", function () {
+        city = event.target.textContent //target which button clicked within search history buttons
+        renderCurrent();
+        renderForecast();
+    })
+
+    function renderCurrent() {
         $.ajax({
             url: "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey,
             method: "GET"
         }).then(function (response) {
-            console.log(response);
-            
+
+            $("#currentForecast").empty();
+
             var location = $("<h2>");
             var temperature = $("<p>");
             var humidity = $("<p>");
@@ -81,9 +83,8 @@
             
             var currentTempF = (((response.main.temp) - 273.15)*1.8 + 32).toPrecision(3);
 
-            var iconCode = response.weather[0].icon;
-            console.log(iconCode);
-            var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png"; 
+            var iconCode = response.weather[0].icon; //new variable stores value of icon code from response
+            var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png"; //new variable stores URL to render correct icon using iconCode
             
             $(icon).attr("src", iconUrl);
             $(location).text(response.name);
@@ -92,11 +93,45 @@
             $(windSpeed).text("Wind Speed: " + response.wind.speed + " MPH");
             $(UVIndex).text("UV Index: blank for now");
 
+            document.querySelector("#currentForecast").style.display = "block";
             $("#currentForecast").append(location, icon, temperature, humidity, windSpeed, UVIndex);
 
+            var historicalSearch = $("<button>");
+            $(historicalSearch).text(response.name);
+            document.querySelector("#searchHistoryButtons").style.display = "block";
+            $("#searchHistoryButtons").prepend("<br>");
+            $("#searchHistoryButtons").prepend(historicalSearch);
+  
         })
+    }
 
-    })
+    function renderForecast (){
+
+        $.ajax({
+            url: "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + apiKey,
+            method: "GET"
+        }).then(function (response) {
+            console.log(response);
+            for (var i=0; i<40; i+=8) {
+
+                var dayContainer = $("<col id=forecastDay>");
+                var dateForecast = $("<p>");
+                var iconForecast = $("<img>");
+                var tempForecast = $("<p>");
+                var humidityForecast = $("<p>");
+
+
+                dateForecast.text(response.list[i].dt).appendTo(dayContainer);
+                tempForecast.text("Temperature: " + ((((response.list[i].main.temp) - 273.15)*1.8 + 32).toPrecision(3)) + " °F").appendTo(dayContainer);
+                humidityForecast.text("Humidity: " + (response.list[i].main.humidity) + " %").appendTo(dayContainer);
+                dayContainer.appendTo("#forecastContainer");
+
+            }   
+        })
+    }
+
+
+    
 
 
 </script>
