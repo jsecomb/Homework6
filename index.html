@@ -8,12 +8,12 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Whether's Weather</title>
+    <title>Webster's Weather</title>
 </head>
 
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4" style="text-align: center">~$~ Deluxe ~ Weather ~$~</h1>
+        <h1 class="display-4" style="text-align: center">~$~ WebWeather ~$~</h1>
     </div>
 </div>
 
@@ -103,7 +103,7 @@
             $(windSpeed).text("Wind Speed: " + response.wind.speed + " MPH");
             
             $.ajax({ //returns UV index from Openweather "UV" api
-                url: "http://api.openweathermap.org/data/2.5/uvi?appid=" + apiKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon,
+                url: "https://api.openweathermap.org/data/2.5/uvi?appid=" + apiKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon,
                 method: "GET"
             }).then(function (response) {
                 $(UVIndex).text("UV Index: " + response.value);
