@@ -55,20 +55,29 @@
 
     document.querySelector("#historyArea").style.display = "none";
     document.querySelector("#currentWeather").style.display = "none";
+
+    if (JSON.parse(window.localStorage.getItem("lastSearch")) != null) { //if there is city saved in local storage, perform renderCurrent and renderForecast.
+        city = JSON.parse(window.localStorage.getItem("lastSearch"));
+        renderCurrent();
+        renderForecast();
+    };
     
-    $("#submit").on("click", function () {
+    
+    $("#submit").on("click", function () { //perform renderCurrent and renderForecast on searched city
         city = $("#search").val();
+        window.localStorage.setItem("lastSearch", JSON.stringify(city)); //set city var to local storage any time new search initiated vie search
         renderCurrent();
         renderForecast();
     })
 
-    $("#searchHistoryButtons").on("click", function () {
-        city = event.target.textContent //target which button clicked within search history buttons
+    $("#searchHistoryButtons").on("click", function () { //perform renderCurrent and renderForecast on clicked city from search history
+        city = event.target.textContent //targets button clicked within search history buttons
+        window.localStorage.setItem("lastSearch", JSON.stringify(city)); //set city var to local storage any time new search initiated via history click
         renderCurrent();
         renderForecast();
     })
 
-    function renderCurrent() {
+    function renderCurrent() { //renders current weather using Openweather "weather" API
         $.ajax({
             url: "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey,
             method: "GET"
@@ -93,14 +102,13 @@
             $(humidity).text("Humidity: " + response.main.humidity + "%");
             $(windSpeed).text("Wind Speed: " + response.wind.speed + " MPH");
             
-            $.ajax({
+            $.ajax({ //returns UV index from Openweather "UV" api
                 url: "http://api.openweathermap.org/data/2.5/uvi?appid=" + apiKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon,
                 method: "GET"
             }).then(function (response) {
                 $(UVIndex).text("UV Index: " + response.value);
-                console.log(response);
                 if (response.value < 3){
-                    UVIndex.css("background-color", "burlywood");
+                    UVIndex.css("background-color", "burlywood"); //color-codes text based on UV value
                 }
                 else if (response.value >= 3 && response.value <8){
                     UVIndex.css("background-color", "orange");
@@ -110,7 +118,7 @@
                 }
             })   
     
-            document.querySelector("#currentWeather").style.display = "block";
+            document.querySelector("#currentWeather").style.display = "block"; 
             $("#currentWeather").append(location, icon, temperature, humidity, windSpeed, UVIndex);
 
             var historicalSearch = $("<button>").text(response.name);
@@ -120,7 +128,7 @@
         })
     }
 
-    function renderForecast (){
+    function renderForecast (){ //renders forecast weather using Openweather "forecast" API
 
         $.ajax({
             url: "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + apiKey,
@@ -150,8 +158,8 @@
         })
     }
 
-    function convertTimestamp(timestamp) {
-        var d = new Date(timestamp * 1000),	// Convert the passed timestamp to milliseconds
+    function convertTimestamp(timestamp) { //converts unix time from API response to conventional time
+        var d = new Date(timestamp * 1000),	
             mm = (d.getMonth() + 1), 
             dd = ('0' + d.getDate()).slice(-2),			
             hh = d.getHours(),
@@ -169,9 +177,8 @@
         } else if (hh == 0) {
             h = 12;
         }
-	
-        time = mm + '/' + dd + ', ' + h + ':' + min + ' ' + ampm;
 
+        time = mm + '/' + dd + ', ' + h + ':' + min + ' ' + ampm;
         return time;
     }
 
