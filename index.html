@@ -13,46 +13,48 @@
 
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4" style="text-align: center">Weather Dashboard</h1>
+        <h1 class="display-4" style="text-align: center">~$~ Deluxe ~ Weather ~$~</h1>
     </div>
 </div>
 
 <body>
     <div class="container" id="pageBody">
+        
         <div class="row">
-            <div class="col-3">
-                <div container="container" id="searchArea">
-                    <h4>Search city weather</h4>
-                    <input type="text" id="search" placeholder="Enter a city">
-                    <button id="submit" type="submit"><i class="fa fa-search"></i></button>
-                </div>
-                <div container="container" id="searchHistoryButtons"></div>
+            <div class="col-12" id="searchArea">
+                <h2>Search City Weather</h2>
+                <input type="text" id="search" placeholder="Enter a city">
+                <button id="submit" type="submit"><i class="fa fa-search"></i></button>
             </div>
-            <div class="col-9">
-                <div class="row">
-                    <div class="container" id="currentForecast">
-                    </div>
-                </div>
-                <div class="row">
-                    Five Day Forecast:
-                </div>
-                <div class="row" id="forecastContainer">
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="container" id="currentWeather" style="text-align: center"></div>
+            </div>
+            <div class="col-6">
+                <div class="container" id="historyArea" style="text-align: center">
+                    <h2>Search History</h2>
+                    <div class="container" id="searchHistoryButtons"></div>
                 </div>
             </div>
         </div>
+    
+        <div id="forecastHeader"></div>
+        <div class="row" id="forecast"></div> 
+
     </div>
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 
-    var apiKey = "d1e2220fab9432369f86d8c8f2b3df41";
+    var apiKey = "35efb3b7f2cbbcee742281c99fc08bc2";
+    var apiKey2 = "d1e2220fab9432369f86d8c8f2b3df41";
     var city;
 
-    
-    document.querySelector("#searchHistoryButtons").style.display = "none";
-    document.querySelector("#currentForecast").style.display = "none";
-    
+    document.querySelector("#historyArea").style.display = "none";
+    document.querySelector("#currentWeather").style.display = "none";
     
     $("#submit").on("click", function () {
         city = $("#search").val();
@@ -72,34 +74,47 @@
             method: "GET"
         }).then(function (response) {
 
-            $("#currentForecast").empty();
+            console.log(response);
+
+            $("#currentWeather").empty();
 
             var location = $("<h2>");
             var temperature = $("<p>");
             var humidity = $("<p>");
             var windSpeed = $("<p>");
             var UVIndex = $("<p>");
-            var icon = $("<img id=weatherIcon>");
+            var icon = $("<img>");
             
             var currentTempF = (((response.main.temp) - 273.15)*1.8 + 32).toPrecision(3);
-
-            var iconCode = response.weather[0].icon; //new variable stores value of icon code from response
-            var iconUrl = "https://openweathermap.org/img/wn/" + iconCode + "@2x.png"; //new variable stores URL to render correct icon using iconCode
             
-            $(icon).attr("src", iconUrl);
+            $(icon).attr("src", "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png");
             $(location).text(response.name);
             $(temperature).text("Temperature: " + currentTempF + " °F");
             $(humidity).text("Humidity: " + response.main.humidity + "%");
             $(windSpeed).text("Wind Speed: " + response.wind.speed + " MPH");
-            $(UVIndex).text("UV Index: blank for now");
+            
+            $.ajax({
+                url: "http://api.openweathermap.org/data/2.5/uvi?appid=" + apiKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon,
+                method: "GET"
+            }).then(function (response) {
+                $(UVIndex).text("UV Index: " + response.value);
+                console.log(response);
+                if (response.value < 3){
+                    UVIndex.css("background-color", "burlywood");
+                }
+                else if (response.value >= 3 && response.value <8){
+                    UVIndex.css("background-color", "orange");
+                }
+                else if (response.value >= 8){
+                    UVIndex.css("background-color", "39ff14");
+                }
+            })   
+    
+            document.querySelector("#currentWeather").style.display = "block";
+            $("#currentWeather").append(location, icon, temperature, humidity, windSpeed, UVIndex);
 
-            document.querySelector("#currentForecast").style.display = "block";
-            $("#currentForecast").append(location, icon, temperature, humidity, windSpeed, UVIndex);
-
-            var historicalSearch = $("<button>");
-            $(historicalSearch).text(response.name);
-            document.querySelector("#searchHistoryButtons").style.display = "block";
-            $("#searchHistoryButtons").prepend("<br>");
+            var historicalSearch = $("<button>").text(response.name);
+            document.querySelector("#historyArea").style.display = "block";
             $("#searchHistoryButtons").prepend(historicalSearch);
   
         })
@@ -111,28 +126,54 @@
             url: "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + apiKey,
             method: "GET"
         }).then(function (response) {
-            console.log(response);
+
+            $("#forecast").empty();
+            $("#forecastHeader").empty();
+
+            $("<h2>").text("Five Day Forecast").appendTo("#forecastHeader");
+
             for (var i=0; i<40; i+=8) {
 
-                var dayContainer = $("<col id=forecastDay>");
-                var dateForecast = $("<p>");
-                var iconForecast = $("<img>");
-                var tempForecast = $("<p>");
-                var humidityForecast = $("<p>");
+                var forecastContainer = $("<col>").attr("id", "forecastDay");
+                var forecastDate = $("<h5>");
+                var forecastIcon = $("<img>");
+                var forecastTemp = $("<p>");
+                var forecastHumid = $("<p>");
+                var forecastIcon = $("<img>");
 
-
-                dateForecast.text(response.list[i].dt).appendTo(dayContainer);
-                tempForecast.text("Temperature: " + ((((response.list[i].main.temp) - 273.15)*1.8 + 32).toPrecision(3)) + " °F").appendTo(dayContainer);
-                humidityForecast.text("Humidity: " + (response.list[i].main.humidity) + " %").appendTo(dayContainer);
-                dayContainer.appendTo("#forecastContainer");
-
+                forecastDate.text(convertTimestamp(response.list[i].dt)).appendTo(forecastContainer);
+                forecastIcon.attr("src", "https://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@2x.png").appendTo(forecastContainer);
+                forecastTemp.text("Temperature: " + ((((response.list[i].main.temp) - 273.15)*1.8 + 32).toPrecision(3)) + " °F").appendTo(forecastContainer);
+                forecastHumid.text("Humidity: " + (response.list[i].main.humidity) + " %").appendTo(forecastContainer);
+                forecastContainer.appendTo("#forecast");
             }   
         })
     }
 
+    function convertTimestamp(timestamp) {
+        var d = new Date(timestamp * 1000),	// Convert the passed timestamp to milliseconds
+            mm = (d.getMonth() + 1), 
+            dd = ('0' + d.getDate()).slice(-2),			
+            hh = d.getHours(),
+            h = hh,
+            min = ('0' + d.getMinutes()).slice(-2),		
+            ampm = 'AM',
+            time;
 
-    
+        if (hh > 12) {
+            h = hh - 12;
+            ampm = 'PM';
+        } else if (hh === 12) {
+            h = 12;
+            ampm = 'PM';
+        } else if (hh == 0) {
+            h = 12;
+        }
+	
+        time = mm + '/' + dd + ', ' + h + ':' + min + ' ' + ampm;
 
+        return time;
+    }
 
 </script>
 
