@@ -20,15 +20,13 @@
 <body>
     <div class="container" id="pageBody">
         
-        <div class="row">
-            <div class="col-12" id="searchArea">
-                <h2>Search City Weather</h2>
-                <input type="text" id="search" placeholder="Enter a city">
-                <button id="submit" type="submit"><i class="fa fa-search"></i></button>
-            </div>
+        <div class="row justify-content-md-center" id="searchArea">
+            <h2>Search City Weather</h2>
+            <input type="text" id="search" placeholder="Enter a city">
+            <button id="submit" type="submit"><i class="fa fa-search"></i></button>
         </div>
 
-        <div class="row">
+        <div class="row justify-content-md-center">
             <div class="col-6">
                 <div class="container" id="currentWeather" style="text-align: center"></div>
             </div>
@@ -41,7 +39,7 @@
         </div>
     
         <div id="forecastHeader"></div>
-        <div class="row" id="forecast"></div> 
+        <div class="row justify-content-md-center" id="forecast"></div> 
 
     </div>
 </body>
@@ -138,7 +136,7 @@
             $("#forecast").empty();
             $("#forecastHeader").empty();
 
-            $("<h2>").text("Five Day Forecast").appendTo("#forecastHeader");
+            $("<h2>").text("Five Day Forecast").attr("align", "center").appendTo("#forecastHeader");
 
             for (var i=0; i<40; i+=8) {
 

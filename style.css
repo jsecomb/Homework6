@@ -20,6 +20,7 @@
 
 #search{
     border-color: maroon;
+    margin-left: 16px;
 }
 
 #submit{
@@ -68,6 +69,7 @@ h2{
     font-size: 24px;
     color: purple;
     font-weight: bold;
+    margin-top: 5px;
 }
 
 h4{
