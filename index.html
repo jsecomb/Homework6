@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<body>
+<body> 
     <div class="container" id="pageBody">
         
         <div class="row justify-content-md-center" id="searchArea">
@@ -48,7 +48,6 @@
 <script>
 
     var apiKey = "35efb3b7f2cbbcee742281c99fc08bc2";
-    var apiKey2 = "d1e2220fab9432369f86d8c8f2b3df41";
     var city;
 
     document.querySelector("#historyArea").style.display = "none";
@@ -83,19 +82,19 @@
 
             console.log(response);
 
-            $("#currentWeather").empty();
+            $("#currentWeather").empty(); //clear html from previous search
 
-            var location = $("<h2>");
+            var location = $("<h2>"); //create html elements
             var temperature = $("<p>");
             var humidity = $("<p>");
             var windSpeed = $("<p>");
             var UVIndex = $("<p>");
             var icon = $("<img>");
             
-            var currentTempF = (((response.main.temp) - 273.15)*1.8 + 32).toPrecision(3);
+            var currentTempF = (((response.main.temp) - 273.15)*1.8 + 32).toPrecision(3); //convert temp to F
             
-            $(icon).attr("src", "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png");
-            $(location).text(response.name);
+            $(icon).attr("src", "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png"); //set icon image source to correct URl
+            $(location).text(response.name); 
             $(temperature).text("Temperature: " + currentTempF + " °F");
             $(humidity).text("Humidity: " + response.main.humidity + "%");
             $(windSpeed).text("Wind Speed: " + response.wind.speed + " MPH");
@@ -104,7 +103,7 @@
                 url: "https://api.openweathermap.org/data/2.5/uvi?appid=" + apiKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon,
                 method: "GET"
             }).then(function (response) {
-                $(UVIndex).text("UV Index: " + response.value);
+                $(UVIndex).text("UV Index: " + response.value); //set UV text to valyue from response
                 if (response.value < 3){
                     UVIndex.css("background-color", "burlywood"); //color-codes text based on UV value
                 }
@@ -116,12 +115,12 @@
                 }
             })   
     
-            document.querySelector("#currentWeather").style.display = "block"; 
-            $("#currentWeather").append(location, icon, temperature, humidity, windSpeed, UVIndex);
+            document.querySelector("#currentWeather").style.display = "block"; //make currentWeather html elements visible
+            $("#currentWeather").append(location, icon, temperature, humidity, windSpeed, UVIndex); //attach html elements 
 
-            var historicalSearch = $("<button>").text(response.name);
-            document.querySelector("#historyArea").style.display = "block";
-            $("#searchHistoryButtons").prepend(historicalSearch);
+            var historicalSearch = $("<button>").text(response.name); //create new button for search just performed
+            document.querySelector("#historyArea").style.display = "block"; //make search history html elements visible
+            $("#searchHistoryButtons").prepend(historicalSearch); //attach button into search history button area
   
         })
     }
@@ -133,12 +132,12 @@
             method: "GET"
         }).then(function (response) {
 
-            $("#forecast").empty();
-            $("#forecastHeader").empty();
+            $("#forecast").empty(); //clear html from previous search
+            $("#forecastHeader").empty(); //clear old header (if there is one)
 
-            $("<h2>").text("Five Day Forecast").attr("align", "center").appendTo("#forecastHeader");
+            $("<h2>").text("Five Day Forecast").attr("align", "center").appendTo("#forecastHeader"); //create header
 
-            for (var i=0; i<40; i+=8) {
+            for (var i=0; i<40; i+=8) { //for loop creates html variables, sets text for 5 day forecast. Iterates by 8 because there are 8 forecasts/day in response.
 
                 var forecastContainer = $("<col>").attr("id", "forecastDay");
                 var forecastDate = $("<h5>");
