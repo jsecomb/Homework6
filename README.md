@@ -10,4 +10,6 @@ The second function (renderForecast) accesses Openweather's forecast API and pul
 
 Finally, local storage is used to store the search input for the latest search done in the app. When the page is opened or refreshed, a search is automatically initiated on this value.
 
+Deployed Application: https://jsecomb.github.io/Homework6/
+
 
